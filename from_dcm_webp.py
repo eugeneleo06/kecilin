@@ -10,6 +10,8 @@ file_path = 'mri_single/mri.dcm'
 # Read the DICOM file
 obj = pydicom.dcmread(file_path)
 
+print(obj)
+
 obj1 = obj.pixel_array
 
 for i in range(obj1.shape[0]):

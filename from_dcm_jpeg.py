@@ -2,6 +2,7 @@ import cv2
 import pydicom
 import numpy as np
 import json
+from PIL import Image
 
 # Path to your single DICOM file
 file_path = 'mri_single_jpeg/mri.dcm'
@@ -14,12 +15,20 @@ obj1 = obj.pixel_array
 for i in range(obj1.shape[0]):
     img = obj1[i].astype(float)
 
-    # Normalize the image to 0-255
     rscl_img = (np.maximum(img, 0) / img.max()) * 255
     final_img = np.uint8(rscl_img)
+    im = Image.fromarray(final_img)
+    im.save("mri_single_jpeg/mri_" + str(i) + ".jpeg", 'JPEG', quality=100)
 
-    # Save the image as JPEG with specified quality
-    cv2.imwrite("mri_single_jpeg/mri_" + str(i) + ".jpeg", final_img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+# for i in range(obj1.shape[0]):
+#     img = obj1[i].astype(float)
+
+#     # Normalize the image to 0-255
+#     rscl_img = (np.maximum(img, 0) / img.max()) * 255
+#     final_img = np.uint8(rscl_img)
+
+#     # Save the image as JPEG with specified quality
+#     cv2.imwrite("mri_single_jpeg/mri_" + str(i) + ".jpeg", final_img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
 
 del obj.PixelData
 
