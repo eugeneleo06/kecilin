@@ -8,7 +8,7 @@ from skimage.metrics import structural_similarity as ssim
 from skimage.metrics import peak_signal_noise_ratio as psnr
 import os
 import matplotlib.pyplot as plt
-import xlsxwriter
+import plotly.graph_objects as go
 
 quality = [90,80,70,60,50,40]
 
@@ -176,75 +176,110 @@ df_70['SSIM'] = pd.to_numeric(df_70['SSIM'], errors='coerce')
 df_80['SSIM'] = pd.to_numeric(df_80['SSIM'], errors='coerce')
 df_90['SSIM'] = pd.to_numeric(df_90['SSIM'], errors='coerce')
 
-print(df_jpeg['SSIM'])
-# Now, try plotting again
-# plt.figure(figsize=(15, 8))
-# plt.bar(df_jpeg['Sequence'], df_jpeg['PSNR'], label='PSNR_JPEG')
-# plt.bar(df_40['Sequence'], df_40['PSNR'], bottom=df_jpeg['PSNR'],label='PSNR_40')
-# plt.bar(df_50['Sequence'], df_50['PSNR'], bottom=df_jpeg['PSNR']+df_40['PSNR'], label='PSNR_50')
-# plt.bar(df_60['Sequence'], df_60['PSNR'], bottom=df_jpeg['PSNR']+df_40['PSNR']+df_50['PSNR'],label='PSNR_60')
-# plt.bar(df_70['Sequence'], df_70['PSNR'], bottom=df_jpeg['PSNR']+df_40['PSNR']+df_50['PSNR']+df_60['PSNR'],label='PSNR_70')
-# plt.bar(df_70['Sequence'], df_80['PSNR'], bottom=df_jpeg['PSNR']+df_40['PSNR']+df_50['PSNR']+df_60['PSNR']+df_70['PSNR'],label='PSNR_80')
-# plt.bar(df_80['Sequence'], df_90['PSNR'], bottom=df_jpeg['PSNR']+df_40['PSNR']+df_50['PSNR']+df_60['PSNR']+df_70['PSNR']+df_80['PSNR'],label='PSNR_90')
-# plt.xlabel('Sequence')
-# plt.ylabel('Value')
-# plt.title('PSNR')
-# plt.legend(bbox_to_anchor=(1.0, 1.0), loc='upper left')
-# plt.tight_layout()
-# plt.show()
 
-plt.figure(figsize=(15, 8))
-plt.bar(df_jpeg['Sequence'], df_jpeg['SSIM'], label='SSIM_JPEG')
-plt.bar(df_40['Sequence'], df_40['SSIM'], bottom=df_jpeg['SSIM'],label='SSIM_40')
-plt.bar(df_50['Sequence'], df_50['SSIM'], bottom=df_jpeg['SSIM']+df_40['SSIM'], label='SSIM_50')
-plt.bar(df_60['Sequence'], df_60['SSIM'], bottom=df_jpeg['SSIM']+df_40['SSIM']+df_50['SSIM'],label='SSIM_60')
-plt.bar(df_70['Sequence'], df_70['SSIM'], bottom=df_jpeg['SSIM']+df_40['SSIM']+df_50['SSIM']+df_60['SSIM'],label='SSIM_70')
-plt.bar(df_70['Sequence'], df_80['SSIM'], bottom=df_jpeg['SSIM']+df_40['SSIM']+df_50['SSIM']+df_60['SSIM']+df_70['SSIM'],label='SSIM_80')
-plt.bar(df_80['Sequence'], df_90['SSIM'], bottom=df_jpeg['SSIM']+df_40['SSIM']+df_50['SSIM']+df_60['SSIM']+df_70['SSIM']+df_80['SSIM'],label='SSIM_90')
-plt.xlabel('Sequence')
-plt.ylabel('Value')
-plt.title('SSIM')
-plt.legend(bbox_to_anchor=(1.0, 1.0), loc='upper left')
-plt.ylim(0.96,1.0)
-plt.tight_layout()
-plt.show()
+# Create a Plotly figure
+fig = go.Figure()
 
-# Writing DataFrames to different sheets in the same Excel file
-# with pd.ExcelWriter(excel_file_path, engine='openpyxl') as writer:
-#     df_jpeg.to_excel(writer, sheet_name='JPEG', index=False)
-#     df_40.to_excel(writer, sheet_name='WEBP 40', index=False)
-#     df_50.to_excel(writer, sheet_name='WEBP 50', index=False)
-#     df_60.to_excel(writer, sheet_name='WEBP 60', index=False)
-#     df_70.to_excel(writer, sheet_name='WEBP 70', index=False)
-#     df_80.to_excel(writer, sheet_name='WEBP 80', index=False)
-#     df_90.to_excel(writer, sheet_name='WEBP 90', index=False)
 
-# with pd.ExcelWriter(excel_file_path, engine='xlsxwriter') as writer:
-#     workbook = writer.book
-    
-#     # Example for adding JPEG DataFrame to Excel
-#     df_jpeg.to_excel(writer, sheet_name='JPEG', index=False)
-#     worksheet = writer.sheets['JPEG']
-    
-#     # Create a chart object
-#     chart = workbook.add_chart({'type': 'line'})
-    
-#     # Configure the series of the chart from the DataFrame data
-#     # Adjust the range based on your DataFrame size
-#     max_row = len(df_jpeg) + 1
-#     chart.add_series({
-#         'name': 'PSNR JPEG',
-#         'categories': '=JPEG!$B$2:$B${}'.format(max_row),
-#         'values': '=JPEG!$B$2:$B${}'.format(max_row),
-#     })
-#     chart.add_series({
-#         'name': 'SSIM JPEG',
-#         'categories': '=JPEG!$C$2:$C${}'.format(max_row),
-#         'values': '=JPEG!$C$2:$C${}'.format(max_row),
-#     })
-    
-#     # Add chart to the worksheet
-#     worksheet.insert_chart('F2', chart)
-    
-#     # Repeat similar steps for other DataFrames and their corresponding sheets
-    
+# Add a bar trace for each category
+fig.add_trace(go.Bar(
+    x=df_jpeg['Sequence'],
+    y=df_jpeg['PSNR'],
+    name='PSNR_JPEG'
+))
+fig.add_trace(go.Bar(
+    x=df_50['Sequence'],
+    y=df_50['PSNR'],
+    name='PSNR_WEBP_50'
+))
+fig.add_trace(go.Bar(
+    x=df_60['Sequence'],
+    y=df_60['PSNR'],
+    name='PSNR_WEBP_60'
+))
+fig.add_trace(go.Bar(
+    x=df_70['Sequence'],
+    y=df_70['PSNR'],
+    name='PSNR_WEBP_70'
+))
+fig.add_trace(go.Bar(
+    x=df_80['Sequence'],
+    y=df_80['PSNR'],
+    name='PSNR_WEBP_80'
+))
+fig.add_trace(go.Bar(
+    x=df_90['Sequence'],
+    y=df_90['PSNR'],
+    name='PSNR_WEBP_90'
+))
+
+
+# Update the layout for a grouped bar plot
+fig.update_layout(
+    barmode='group',
+    title='Grouped Bar Plot of PSNR',
+    xaxis=dict(title='Sequence'),
+    yaxis=dict(title='PSNR', range=[41, 51]),
+    legend_title="PSNR Categories",
+    width=1500,  # Adjust the width of the figure
+    height=600   # Adjust the height of the figure
+)
+
+# Make the figure interactive
+fig.update_traces(marker_line_width=1.5, opacity=1)
+
+# Show the plot
+fig.show()
+
+# Create a Plotly figure
+fig = go.Figure()
+
+# Add a bar trace for each category
+fig.add_trace(go.Bar(
+    x=df_jpeg['Sequence'],
+    y=df_jpeg['SSIM'],
+    name='SSIM_JPEG'
+))
+fig.add_trace(go.Bar(
+    x=df_50['Sequence'],
+    y=df_50['SSIM'],
+    name='SSIM_WEBP_50'
+))
+fig.add_trace(go.Bar(
+    x=df_60['Sequence'],
+    y=df_60['SSIM'],
+    name='SSIM_WEBP_60'
+))
+fig.add_trace(go.Bar(
+    x=df_70['Sequence'],
+    y=df_70['SSIM'],
+    name='SSIM_WEBP_70'
+))
+fig.add_trace(go.Bar(
+    x=df_80['Sequence'],
+    y=df_80['SSIM'],
+    name='SSIM_WEBP_80'
+))
+fig.add_trace(go.Bar(
+    x=df_90['Sequence'],
+    y=df_90['SSIM'],
+    name='SSIM_WEBP_90'
+))
+
+
+# Update the layout for a grouped bar plot
+fig.update_layout(
+    barmode='group',
+    title='Grouped Bar Plot of SSIM',
+    xaxis=dict(title='Sequence'),
+    yaxis=dict(title='SSIM', range=[0.96, 1]),
+    legend_title="SSIM Categories",
+    width=1500,  # Adjust the width of the figure
+    height=600   # Adjust the height of the figure
+)
+
+# Make the figure interactive
+fig.update_traces(marker_line_width=1.5, opacity=1)
+
+# Show the plot
+fig.show()
