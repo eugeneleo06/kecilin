@@ -188,6 +188,11 @@ fig.add_trace(go.Bar(
     name='PSNR_JPEG'
 ))
 fig.add_trace(go.Bar(
+    x=df_40['Sequence'],
+    y=df_40['PSNR'],
+    name='PSNR_WEBP_40'
+))
+fig.add_trace(go.Bar(
     x=df_50['Sequence'],
     y=df_50['PSNR'],
     name='PSNR_WEBP_50'
@@ -239,6 +244,11 @@ fig.add_trace(go.Bar(
     x=df_jpeg['Sequence'],
     y=df_jpeg['SSIM'],
     name='SSIM_JPEG'
+))
+fig.add_trace(go.Bar(
+    x=df_40['Sequence'],
+    y=df_40['SSIM'],
+    name='SSIM_WEBP_40'
 ))
 fig.add_trace(go.Bar(
     x=df_50['Sequence'],
