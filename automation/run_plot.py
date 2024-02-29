@@ -226,8 +226,8 @@ fig.update_layout(
     xaxis=dict(title='Sequence'),
     yaxis=dict(title='PSNR', range=[41, 51]),
     legend_title="PSNR Categories",
-    width=1500,  # Adjust the width of the figure
-    height=600   # Adjust the height of the figure
+    width=1800,  # Adjust the width of the figure
+    height=900   # Adjust the height of the figure
 )
 
 # Make the figure interactive
@@ -284,8 +284,8 @@ fig.update_layout(
     xaxis=dict(title='Sequence'),
     yaxis=dict(title='SSIM', range=[0.96, 1]),
     legend_title="SSIM Categories",
-    width=1500,  # Adjust the width of the figure
-    height=600   # Adjust the height of the figure
+    width=1800,  # Adjust the width of the figure
+    height=900   # Adjust the height of the figure
 )
 
 # Make the figure interactive
