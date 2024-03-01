@@ -38,21 +38,10 @@ jpeg_paths = []
 
 for i in range (n):
     jpeg_paths.append('mri_single_jpeg/mri_'+ str(i) +'.jpeg')
-
-# jpeg_frames_as_bytes = []
-# for file_path in jpeg_paths:
-#     # Open the image with Pillow
-#     with Image.open(file_path) as img:
-#         # Convert the image to bytes
-#         with io.BytesIO() as output:
-#             img.save(output, format="JPEG")
-#             jpeg_frames_as_bytes.append(output.getvalue())
     
 jpeg_frames_as_bytes = []
 for file_path in jpeg_paths:
     img = cv2.imread(file_path)
-    # Convert to JPEG format in memory
-    # cv2.imencode returns a tuple where the first element is a success flag and the second is the buffer
     pil_img = Image.fromarray(img)
     
     with io.BytesIO() as output:

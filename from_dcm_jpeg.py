@@ -18,17 +18,7 @@ for i in range(obj1.shape[0]):
     rscl_img = (np.maximum(img, 0) / img.max()) * 255
     final_img = np.uint8(rscl_img)
     im = Image.fromarray(final_img)
-    im.save("mri_single_jpeg/mri_" + str(i) + ".jpeg", 'JPEG', quality=100)
-
-# for i in range(obj1.shape[0]):
-#     img = obj1[i].astype(float)
-
-#     # Normalize the image to 0-255
-#     rscl_img = (np.maximum(img, 0) / img.max()) * 255
-#     final_img = np.uint8(rscl_img)
-
-#     # Save the image as JPEG with specified quality
-#     cv2.imwrite("mri_single_jpeg/mri_" + str(i) + ".jpeg", final_img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+    im.save("mri_single_jpeg/mri_" + str(i) + ".jpeg", 'JPEG', quality=50)
 
 del obj.PixelData
 
