@@ -159,6 +159,7 @@ df_90 = pd.DataFrame(data_90)
 # Specify the Excel file path
 excel_file_path = 'automation/result.xlsx'
 
+
 df_jpeg['PSNR'] = pd.to_numeric(df_jpeg['PSNR'], errors='coerce')
 df_40['PSNR'] = pd.to_numeric(df_40['PSNR'], errors='coerce')
 df_50['PSNR'] = pd.to_numeric(df_50['PSNR'], errors='coerce')
@@ -175,32 +176,120 @@ df_70['SSIM'] = pd.to_numeric(df_70['SSIM'], errors='coerce')
 df_80['SSIM'] = pd.to_numeric(df_80['SSIM'], errors='coerce')
 df_90['SSIM'] = pd.to_numeric(df_90['SSIM'], errors='coerce')
 
-plt.figure(figsize=(12, 6))
-plt.plot(seq, df_jpeg['PSNR'], label='JPEG', marker='o', linestyle='-')
-plt.plot(seq, df_40['PSNR'], label='WEBP 40', marker='o', linestyle='-')
-plt.plot(seq, df_50['PSNR'], label='WEBP 50', marker='o', linestyle='-')
-plt.plot(seq, df_60['PSNR'], label='WEBP 60', marker='o', linestyle='-')
-plt.plot(seq, df_70['PSNR'], label='WEBP 70', marker='o', linestyle='-')
-plt.plot(seq, df_80['PSNR'], label='WEBP 80', marker='o', linestyle='-')
-plt.plot(seq, df_90['PSNR'], label='WEBP 90', marker='o', linestyle='-')
-plt.title('PSNR Comparison')
-plt.xlabel('Sequence')
-plt.ylabel('PSNR')
-plt.legend(bbox_to_anchor=(1.0, 1.0), loc='upper left')
-plt.tight_layout()
-plt.savefig('automation/plot/psnr.png')
 
-plt.figure(figsize=(12, 6))
-plt.plot(seq, df_jpeg['SSIM'], label='JPEG', marker='o', linestyle='-')
-plt.plot(seq, df_40['SSIM'], label='WEBP 40', marker='o', linestyle='-')
-plt.plot(seq, df_50['SSIM'], label='WEBP 50', marker='o', linestyle='-')
-plt.plot(seq, df_60['SSIM'], label='WEBP 60', marker='o', linestyle='-')
-plt.plot(seq, df_70['SSIM'], label='WEBP 70', marker='o', linestyle='-')
-plt.plot(seq, df_80['SSIM'], label='WEBP 80', marker='o', linestyle='-')
-plt.plot(seq, df_90['SSIM'], label='WEBP 90', marker='o', linestyle='-')
-plt.title('SSIM Comparison')
-plt.xlabel('Sequence')
-plt.ylabel('SSIM')
-plt.legend(bbox_to_anchor=(1.0, 1.0), loc='upper left')
-plt.tight_layout()
-plt.savefig('automation/plot/ssim.png')
+# Create a Plotly figure
+fig = go.Figure()
+
+
+# Add a bar trace for each category
+fig.add_trace(go.Bar(
+    x=df_jpeg['Sequence'],
+    y=df_jpeg['PSNR'],
+    name='PSNR_JPEG'
+))
+fig.add_trace(go.Bar(
+    x=df_40['Sequence'],
+    y=df_40['PSNR'],
+    name='PSNR_WEBP_40'
+))
+fig.add_trace(go.Bar(
+    x=df_50['Sequence'],
+    y=df_50['PSNR'],
+    name='PSNR_WEBP_50'
+))
+fig.add_trace(go.Bar(
+    x=df_60['Sequence'],
+    y=df_60['PSNR'],
+    name='PSNR_WEBP_60'
+))
+fig.add_trace(go.Bar(
+    x=df_70['Sequence'],
+    y=df_70['PSNR'],
+    name='PSNR_WEBP_70'
+))
+fig.add_trace(go.Bar(
+    x=df_80['Sequence'],
+    y=df_80['PSNR'],
+    name='PSNR_WEBP_80'
+))
+fig.add_trace(go.Bar(
+    x=df_90['Sequence'],
+    y=df_90['PSNR'],
+    name='PSNR_WEBP_90'
+))
+
+
+# Update the layout for a grouped bar plot
+fig.update_layout(
+    barmode='group',
+    title='Grouped Bar Plot of PSNR',
+    xaxis=dict(title='Sequence'),
+    yaxis=dict(title='PSNR', range=[41, 51]),
+    legend_title="PSNR Categories",
+    width=1800,  # Adjust the width of the figure
+    height=900   # Adjust the height of the figure
+)
+
+# Make the figure interactive
+fig.update_traces(marker_line_width=1.5, opacity=1)
+
+# Show the plot
+fig.show()
+
+# Create a Plotly figure
+fig = go.Figure()
+
+# Add a bar trace for each category
+fig.add_trace(go.Bar(
+    x=df_jpeg['Sequence'],
+    y=df_jpeg['SSIM'],
+    name='SSIM_JPEG'
+))
+fig.add_trace(go.Bar(
+    x=df_40['Sequence'],
+    y=df_40['SSIM'],
+    name='SSIM_WEBP_40'
+))
+fig.add_trace(go.Bar(
+    x=df_50['Sequence'],
+    y=df_50['SSIM'],
+    name='SSIM_WEBP_50'
+))
+fig.add_trace(go.Bar(
+    x=df_60['Sequence'],
+    y=df_60['SSIM'],
+    name='SSIM_WEBP_60'
+))
+fig.add_trace(go.Bar(
+    x=df_70['Sequence'],
+    y=df_70['SSIM'],
+    name='SSIM_WEBP_70'
+))
+fig.add_trace(go.Bar(
+    x=df_80['Sequence'],
+    y=df_80['SSIM'],
+    name='SSIM_WEBP_80'
+))
+fig.add_trace(go.Bar(
+    x=df_90['Sequence'],
+    y=df_90['SSIM'],
+    name='SSIM_WEBP_90'
+))
+
+
+# Update the layout for a grouped bar plot
+fig.update_layout(
+    barmode='group',
+    title='Grouped Bar Plot of SSIM',
+    xaxis=dict(title='Sequence'),
+    yaxis=dict(title='SSIM', range=[0.96, 1]),
+    legend_title="SSIM Categories",
+    width=1800,  # Adjust the width of the figure
+    height=900   # Adjust the height of the figure
+)
+
+# Make the figure interactive
+fig.update_traces(marker_line_width=1.5, opacity=1)
+
+# Show the plot
+fig.show()
