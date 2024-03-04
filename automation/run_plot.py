@@ -152,3 +152,38 @@ plt.ylabel('Size (KB)')
 plt.legend(bbox_to_anchor=(1.0, 1.0), loc='upper left')
 plt.tight_layout()
 plt.savefig('automation/plot/size.png')
+
+avg = {}
+
+for x in ext:
+    for y in quality:
+        data = {}
+        psnr_avg = df[generate_key(x,y)]['PSNR']
+        ssim_avg = df[generate_key(x,y)]['SSIM']
+        size_avg = df[generate_key(x,y)]['Size (KB)']
+        data['PSNR'] = sum(psnr_avg) / len(psnr_avg)
+        data['SSIM'] = sum(ssim_avg) / len(ssim_avg)
+        data['Size (KB)'] = sum(size_avg) / len(size_avg)
+        avg[generate_key(x,y)] = data
+
+plt.figure(figsize=(12, 6))
+for x in ext:
+    for y in quality:
+        plt.scatter(avg[generate_key(x,y)]['Size (KB)'], avg[generate_key(x,y)]['PSNR'], label=generate_key(x,y), s=20)
+plt.title('PSNR Comparison')
+plt.xlabel('Size (KB)')
+plt.ylabel('PSNR')
+plt.legend(bbox_to_anchor=(1.0, 1.0), loc='upper left')
+plt.tight_layout()
+plt.savefig('automation/plot/psnr_2.png')
+
+plt.figure(figsize=(12, 6))
+for x in ext:
+    for y in quality:
+        plt.scatter(avg[generate_key(x,y)]['Size (KB)'], avg[generate_key(x,y)]['SSIM'], label=generate_key(x,y), s=20)
+plt.title('SSIM Comparison')
+plt.xlabel('Size (KB)')
+plt.ylabel('SSIM')
+plt.legend(bbox_to_anchor=(1.0, 1.0), loc='upper left')
+plt.tight_layout()
+plt.savefig('automation/plot/ssim_2.png')
