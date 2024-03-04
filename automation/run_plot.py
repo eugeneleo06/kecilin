@@ -154,6 +154,9 @@ plt.tight_layout()
 plt.savefig('automation/plot/size.png')
 
 avg = {}
+lendata = len(quality) * len(ext)
+color1 = iter(plt.cm.jet(np.linspace(0, 1, lendata)))
+color2 = iter(plt.cm.jet(np.linspace(0, 1, lendata)))
 
 for x in ext:
     for y in quality:
@@ -169,21 +172,24 @@ for x in ext:
 plt.figure(figsize=(12, 6))
 for x in ext:
     for y in quality:
-        plt.scatter(avg[generate_key(x,y)]['Size (KB)'], avg[generate_key(x,y)]['PSNR'], label=generate_key(x,y), s=20)
+        c = next(color1)
+        plt.scatter(avg[generate_key(x,y)]['Size (KB)'], avg[generate_key(x,y)]['PSNR'], label=generate_key(x,y), s=20, color=c)
+
 plt.title('PSNR Comparison')
 plt.xlabel('Size (KB)')
 plt.ylabel('PSNR')
 plt.legend(bbox_to_anchor=(1.0, 1.0), loc='upper left')
 plt.tight_layout()
-plt.savefig('automation/plot/psnr_2.png')
+plt.savefig('automation/plot/psnr_size.png')
 
 plt.figure(figsize=(12, 6))
 for x in ext:
     for y in quality:
-        plt.scatter(avg[generate_key(x,y)]['Size (KB)'], avg[generate_key(x,y)]['SSIM'], label=generate_key(x,y), s=20)
+        c = next(color2)
+        plt.scatter(avg[generate_key(x,y)]['Size (KB)'], avg[generate_key(x,y)]['SSIM'], label=generate_key(x,y), s=20, color=c)
 plt.title('SSIM Comparison')
 plt.xlabel('Size (KB)')
 plt.ylabel('SSIM')
 plt.legend(bbox_to_anchor=(1.0, 1.0), loc='upper left')
-plt.tight_layout()
-plt.savefig('automation/plot/ssim_2.png')
+plt.tight_layout()  
+plt.savefig('automation/plot/ssim_size.png')
