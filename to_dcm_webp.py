@@ -8,7 +8,7 @@ from PIL import Image
 import io
 
 # Opening JSON file
-f = open('mri_single/meta.json')
+f = open('mri_single2/meta.json')
  
 # returns JSON object as 
 # a dictionary
@@ -31,14 +31,14 @@ ds = Dataset.from_json(data_without_meta)
 
 ds.file_meta = Dataset.from_json(json.dumps(meta_info_read))
 
-webp_files = glob.glob('mri_single/*.webp')
+webp_files = glob.glob('mri_single2/*.webp')
 
 n = len(webp_files)
 
 webp_paths = []
 
 for i in range (n):
-    webp_paths.append('mri_single/mri_'+ str(i) +'.webp')
+    webp_paths.append('mri_single2/mri_'+ str(i) +'.webp')
     
 
 jpeg_frames_as_bytes = []
@@ -61,4 +61,4 @@ ds.is_implicit_VR = isImplicitVR
 ds.is_little_endian = isLittleEndian
 ds.preamble = b'\0' * 128
 
-ds.save_as('mri_single/mri_res.dcm')
+ds.save_as('mri_single2/mri_res.dcm')

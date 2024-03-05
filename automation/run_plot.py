@@ -10,8 +10,8 @@ import os
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 
-CONST_JPEG = 'JPEG'
-CONST_WEBP = 'WEBP'
+CONST_JPEG = '.JPEG'
+CONST_WEBP = '.WEBP'
 
 quality = [100,90,80,70,60,50,40]
 ext = ['.JPEG', '.WEBP']
@@ -154,9 +154,6 @@ plt.tight_layout()
 plt.savefig('automation/plot/size.png')
 
 avg = {}
-lendata = len(quality) * len(ext)
-color1 = iter(plt.cm.jet(np.linspace(0, 1, lendata)))
-color2 = iter(plt.cm.jet(np.linspace(0, 1, lendata)))
 
 for x in ext:
     for y in quality:
@@ -169,27 +166,106 @@ for x in ext:
         data['Size (KB)'] = sum(size_avg) / len(size_avg)
         avg[generate_key(x,y)] = data
 
-plt.figure(figsize=(12, 6))
+colors = {'jpeg': 'blue', 'webp': 'red'}  
+
+# ================== PSNR =================
+group_coords = {'jpeg': {'x': [], 'y': []}, 'webp': {'x': [], 'y': []}}
+labels = []
+
 for x in ext:
     for y in quality:
-        c = next(color1)
-        plt.scatter(avg[generate_key(x,y)]['Size (KB)'], avg[generate_key(x,y)]['PSNR'], label=generate_key(x,y), s=20, color=c)
+        key = generate_key(x, y)
+        group = 'jpeg' if key.startswith('jpeg') else 'webp'
+        group_coords[group]['x'].append(avg[key]['Size (KB)'])
+        group_coords[group]['y'].append(avg[key]['PSNR'])
+        labels.append(key)
+        
+plt.figure(figsize=(12, 6))
+
+# Plot lines for each group first
+for group, coords in group_coords.items():
+    # Plot line connecting points in this group with a generic label for the group
+    plt.plot(coords['x'], coords['y'], color=colors[group], zorder=1)
+    # line_label = True  # Ensure the group line label is added only once to the legend
+
+# Then plot each point individually for the unique legends
+for x in ext:
+    for y in quality:
+        key = generate_key(x, y)
+        group = 'jpeg' if key.startswith('jpeg') else 'webp'
+        x_coord = avg[key]['Size (KB)']
+        y_coord = avg[key]['PSNR']
+        color = colors[group]
+
+        # Plot the point with a unique label
+        plt.scatter(x_coord, y_coord, color=color, s=20, zorder=2, label=key)
+
+# Handling the legend
+# Extract handles and labels and keep unique labels only
+handles, labels = plt.gca().get_legend_handles_labels()
+unique_labels = []
+unique_handles = []
+for handle, label in zip(handles, labels):
+    if label not in unique_labels:
+        unique_labels.append(label)
+        unique_handles.append(handle)
 
 plt.title('PSNR Comparison')
 plt.xlabel('Size (KB)')
 plt.ylabel('PSNR')
-plt.legend(bbox_to_anchor=(1.0, 1.0), loc='upper left')
+plt.legend(unique_handles, unique_labels, bbox_to_anchor=(1.0, 1.0), loc='upper left')
+plt.grid(True)
+plt.minorticks_on()
+plt.grid(which='minor', linestyle=':', linewidth='0.5', color='gray')
 plt.tight_layout()
 plt.savefig('automation/plot/psnr_size.png')
 
-plt.figure(figsize=(12, 6))
+
+ # ================== SSIM =================
+group_coords = {'jpeg': {'x': [], 'y': []}, 'webp': {'x': [], 'y': []}}
+labels = []
 for x in ext:
     for y in quality:
-        c = next(color2)
-        plt.scatter(avg[generate_key(x,y)]['Size (KB)'], avg[generate_key(x,y)]['SSIM'], label=generate_key(x,y), s=20, color=c)
+        key = generate_key(x, y)
+        group = 'jpeg' if key.startswith('jpeg') else 'webp'
+        group_coords[group]['x'].append(avg[key]['Size (KB)'])
+        group_coords[group]['y'].append(avg[key]['SSIM'])
+        labels.append(key)
+        
+plt.figure(figsize=(12, 6))
+# Plot lines for each group first
+for group, coords in group_coords.items():
+    # Plot line connecting points in this group with a generic label for the group
+    plt.plot(coords['x'], coords['y'], color=colors[group], zorder=1)
+
+# Then plot each point individually for the unique legends
+for x in ext:
+    for y in quality:
+        key = generate_key(x, y)
+        group = 'jpeg' if key.startswith('jpeg') else 'webp'
+        x_coord = avg[key]['Size (KB)']
+        y_coord = avg[key]['SSIM']
+        color = colors[group]
+
+        # Plot the point with a unique label
+        plt.scatter(x_coord, y_coord, color=color, s=20, zorder=2, label=key)
+
+# Handling the legend
+# Extract handles and labels and keep unique labels only
+handles, labels = plt.gca().get_legend_handles_labels()
+unique_labels = []
+unique_handles = []
+for handle, label in zip(handles, labels):
+    if label not in unique_labels:
+        unique_labels.append(label)
+        unique_handles.append(handle)
+
 plt.title('SSIM Comparison')
 plt.xlabel('Size (KB)')
 plt.ylabel('SSIM')
-plt.legend(bbox_to_anchor=(1.0, 1.0), loc='upper left')
+plt.legend(unique_handles, unique_labels, bbox_to_anchor=(1.0, 1.0), loc='upper left')
+plt.grid(True)
+plt.minorticks_on()
+plt.grid(which='minor', linestyle=':', linewidth='0.5', color='gray')
 plt.tight_layout()  
 plt.savefig('automation/plot/ssim_size.png')
