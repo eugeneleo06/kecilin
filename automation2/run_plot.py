@@ -8,13 +8,14 @@ from skimage.metrics import structural_similarity as ssim
 from skimage.metrics import peak_signal_noise_ratio as psnr
 import os
 import matplotlib.pyplot as plt
-import plotly.graph_objects as go
+import imagecodecs
 
 CONST_JPEG = '.JPEG'
 CONST_WEBP = '.WEBP'
+CONST_JXL = '.JXL'
 
 quality = [100,90,80,70,60,50,40]
-ext = ['.JPEG', '.WEBP']
+ext = ['.JPEG', '.WEBP', '.JXL']
 
 # Path to your single DICOM file
 file_path = 'automation2/mri.dcm'
@@ -26,17 +27,31 @@ pixel = dicom.pixel_array
 
 bmp_imgs = []
 for i in range(pixel.shape[0]):
-    
     img = pixel[i].astype(float)
 
     rscl_img = (np.maximum(img, 0) / img.max()) * 255
     final_img = np.uint8(rscl_img)
 
-    im = Image.fromarray(final_img)
-    im.save("automation2/bmp/mri_" + str(i+1) + ".bmp", 'BMP')
+    # im = Image.fromarray(final_img)
+    # im.save("automation/bmp/mri_" + str(i+1) + ".bmp", 'BMP')
+    bmp_filename = 'automation2/bmp/mri_' + str(i+1) + '.bmp'
+    cv2.imwrite(bmp_filename, final_img)
     for x in ext:
         for y in quality:
-            im.save("automation2/" + x[1:].lower() +"_" + str(y) + "/mri_" + str(i+1) + x.lower() , x[1:], quality=y)
+            filename = "automation2/" + x[1:].lower() + "_" + str(y) + "/mri_" + str(i+1) + x.lower()
+            # q = cv2.IMWRITE_JPEG_QUALITY
+            if x == CONST_WEBP:
+                q = cv2.IMWRITE_WEBP_QUALITY
+                cv2.imwrite(filename, final_img, [int(q), y])
+            elif x == CONST_JPEG:
+                r = os.system('cjpeg -quality ' + str(y) + ' -outfile ' + filename + ' ' + bmp_filename)
+            elif x == CONST_JXL:
+                im = Image.open(bmp_filename)
+                im.save('temp.png')
+                r = os.system('./cjxl -q '+ str(y) + ' temp.png ' + filename + ' --quiet')
+                os.remove('temp.png')
+            if r != 0:
+                quit()
 
 def get_paths(name: str, format: str = None):
     # name = jpeg_90
@@ -54,7 +69,7 @@ def get_paths(name: str, format: str = None):
             paths.append("automation2/" + name + "/mri_" + str(i+1) + format.lower())
     return paths
 
-def compare_psnr_ssim(bmp_files, files):
+def compare_psnr_ssim(bmp_files, files, ext=None):
     psnr_arr = []
     ssim_arr = []
     size_arr = []
@@ -63,15 +78,17 @@ def compare_psnr_ssim(bmp_files, files):
 
     for x in range (n):
         img_ori = cv2.imread(bmp_files[x])
-        img_comp = cv2.imread(files[x])
+        if ext == CONST_JXL:
+            img_comp = imagecodecs.imread(files[x])
+        else:
+            img_comp = cv2.imread(files[x])
         
-
         img_ori = cv2.cvtColor(img_ori, cv2.COLOR_BGR2GRAY)
-        img_comp = cv2.cvtColor(img_comp, cv2.COLOR_BGR2GRAY)
+        if img_comp.shape != (512,512):
+            img_comp = cv2.cvtColor(img_comp, cv2.COLOR_BGR2GRAY)
 
         img_ori_arr = np.asarray(img_ori, dtype=np.float32)
         img_comp_arr = np.asarray(img_comp, dtype=np.float32)
-
         psnr_value = psnr(img_ori_arr, img_comp_arr, data_range=255)
         ssim_value, _ = ssim(img_ori_arr, img_comp_arr, full=True, data_range=255)
 
@@ -90,6 +107,15 @@ def compare_psnr_ssim(bmp_files, files):
 def generate_key(extension, quality):
     return f"{extension[1:].lower()}_{quality}"
 
+def generate_group(key):
+    if key.startswith('jpeg'):
+        group = 'jpeg'
+    elif key.startswith('webp'):
+        group = 'webp'
+    elif key.startswith('jxl'):
+        group = 'jxl'
+    return group
+
 data, df, seq = {}, {}, []
 files, psnrData, ssimData, sizeData = {}, {}, {}, {}
 for i in range(pixel.shape[0]):
@@ -100,7 +126,7 @@ files["bmp"] = get_paths('bmp')
 for x in ext:
     for y in quality:
         files[generate_key(x,y)] = get_paths(generate_key(x,y), x)
-        psnrData[generate_key(x,y)], ssimData[generate_key(x,y)], sizeData[generate_key(x,y)] = compare_psnr_ssim(files['bmp'], files[generate_key(x,y)])
+        psnrData[generate_key(x,y)], ssimData[generate_key(x,y)], sizeData[generate_key(x,y)] = compare_psnr_ssim(files['bmp'], files[generate_key(x,y)], x)
         data[generate_key(x,y)] = {
             'Sequence': seq,
             'PSNR': psnrData[generate_key(x,y)],
@@ -167,16 +193,18 @@ for x in ext:
         data['Size (KB)'] = sum(size_avg) / len(size_avg)
         avg[generate_key(x,y)] = data
 
-colors = {'jpeg': 'blue', 'webp': 'red'}  
+colors = {'jpeg': 'blue', 'webp': 'red', 'jxl':'green'}  
 
 # ================== PSNR =================
-group_coords = {'jpeg': {'x': [], 'y': []}, 'webp': {'x': [], 'y': []}}
+group_coords = {}
+for x in ext:
+    group_coords[x[1:].lower()] = {'x': [], 'y': []}
 labels = []
 
 for x in ext:
     for y in quality:
         key = generate_key(x, y)
-        group = 'jpeg' if key.startswith('jpeg') else 'webp'
+        group = generate_group(key)
         group_coords[group]['x'].append(avg[key]['Size (KB)'])
         group_coords[group]['y'].append(avg[key]['PSNR'])
         labels.append(key)
@@ -193,7 +221,7 @@ for group, coords in group_coords.items():
 for x in ext:
     for y in quality:
         key = generate_key(x, y)
-        group = 'jpeg' if key.startswith('jpeg') else 'webp'
+        group = generate_group(key)
         x_coord = avg[key]['Size (KB)']
         y_coord = avg[key]['PSNR']
         color = colors[group]
@@ -223,12 +251,15 @@ plt.savefig('automation2/plot/psnr_size.png')
 
 
  # ================== SSIM =================
-group_coords = {'jpeg': {'x': [], 'y': []}, 'webp': {'x': [], 'y': []}}
+group_coords = {}
+for x in ext:
+    group_coords[x[1:].lower()] = {'x': [], 'y': []}
+
 labels = []
 for x in ext:
     for y in quality:
         key = generate_key(x, y)
-        group = 'jpeg' if key.startswith('jpeg') else 'webp'
+        group = generate_group(key)
         group_coords[group]['x'].append(avg[key]['Size (KB)'])
         group_coords[group]['y'].append(avg[key]['SSIM'])
         labels.append(key)
@@ -243,7 +274,7 @@ for group, coords in group_coords.items():
 for x in ext:
     for y in quality:
         key = generate_key(x, y)
-        group = 'jpeg' if key.startswith('jpeg') else 'webp'
+        group = generate_group(key)
         x_coord = avg[key]['Size (KB)']
         y_coord = avg[key]['SSIM']
         color = colors[group]

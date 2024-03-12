@@ -18,7 +18,7 @@ quality = [100,90,80,70,60,50,40]
 ext = ['.JPEG', '.WEBP', '.JXL']
 
 # Path to your single DICOM file
-file_path = '/home/baptista/Documents/kecilin/automation3/mri3.dcm'
+file_path = 'automation3/mri3.dcm'
 
 # Read the DICOM file
 dicom = pydicom.dcmread(file_path)
