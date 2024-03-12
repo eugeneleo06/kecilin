@@ -3,6 +3,7 @@ import pydicom
 import numpy as np
 import json
 from PIL import Image
+import os
 
 # Path to your single DICOM file
 file_path = 'mri_single_jpeg/mri.dcm'
@@ -17,8 +18,9 @@ for i in range(obj1.shape[0]):
 
     rscl_img = (np.maximum(img, 0) / img.max()) * 255
     final_img = np.uint8(rscl_img)
-    im = Image.fromarray(final_img)
-    im.save("mri_single_jpeg/mri_" + str(i) + ".jpeg", 'JPEG', quality=50)
+    # im = Image.fromarray(final_img)
+    # im.save("mri_single_jpeg/mri_" + str(i) + ".jpeg", 'JPEG', quality=50)
+    cv2.imwrite("mri_single_jpeg/mri_" + str(i) + ".jpeg", final_img, [int(cv2.IMWRITE_JPEG_QUALITY), 80])
 
 del obj.PixelData
 

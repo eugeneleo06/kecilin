@@ -10,12 +10,12 @@ import os
 import matplotlib.pyplot as plt
 import imagecodecs
 
-CONST_JPEG = '.JPEG'
 CONST_WEBP = '.WEBP'
 CONST_JXL = '.JXL'
+CONST_JP2 = '.JP2'
 
 quality = [100,90,80,70,60,50,40]
-ext = ['.JPEG', '.WEBP', '.JXL']
+ext = [CONST_WEBP, CONST_JXL, CONST_JP2]
 
 # Path to your single DICOM file
 file_path = 'automation/mri.dcm'
@@ -34,25 +34,30 @@ for i in range(pixel.shape[0]):
 
     # im = Image.fromarray(final_img)
     # im.save("automation/bmp/mri_" + str(i+1) + ".bmp", 'BMP')
-    bmp_filename = 'automation/bmp/mri_' + str(i+1) + '.bmp'
+    bmp_folder = 'automation/bmp'
+    os.makedirs(bmp_folder, exist_ok=True)
+    bmp_filename = bmp_folder + '/mri_' + str(i+1) + '.bmp'
     cv2.imwrite(bmp_filename, final_img)
     for x in ext:
         for y in quality:
-            filename = "automation/" + x[1:].lower() + "_" + str(y) + "/mri_" + str(i+1) + x.lower()
-            # q = cv2.IMWRITE_JPEG_QUALITY
+            folder_name = "automation/" + x[1:].lower() + "_" + str(y)
+            os.makedirs(folder_name, exist_ok=True)
+            filename = folder_name + "/mri_" + str(i+1) + x.lower()
             if x == CONST_WEBP:
                 q = cv2.IMWRITE_WEBP_QUALITY
                 cv2.imwrite(filename, final_img, [int(q), y])
-            elif x == CONST_JPEG:
-                r = os.system('cjpeg -quality ' + str(y) + ' -outfile ' + filename + ' ' + bmp_filename)
             elif x == CONST_JXL:
                 im = Image.open(bmp_filename)
                 im.save('temp.png')
                 r = os.system('./cjxl -q '+ str(y) + ' temp.png ' + filename + ' --quiet')
                 os.remove('temp.png')
-            if r != 0:
-                quit()
-
+            elif x == CONST_JP2:
+                # q = cv2.IMWRITE_JPEG2000_COMPRESSION_X1000
+                # cv2.imwrite(filename, final_img, [int(q), y*10])
+                im = Image.open(bmp_filename)
+                im.save('temp2.png')
+                r = os.system('opj_compress -q '+ str(y) + ' -i temp2.png -o ' + filename)
+                os.remove('temp2.png')
 def get_paths(name: str, format: str = None):
     # name = jpeg_90
     # format = .jpeg
@@ -108,8 +113,8 @@ def generate_key(extension, quality):
     return f"{extension[1:].lower()}_{quality}"
 
 def generate_group(key):
-    if key.startswith('jpeg'):
-        group = 'jpeg'
+    if key.startswith('jp2'):
+        group = 'jp2'
     elif key.startswith('webp'):
         group = 'webp'
     elif key.startswith('jxl'):
@@ -193,7 +198,7 @@ for x in ext:
         data['Size (KB)'] = sum(size_avg) / len(size_avg)
         avg[generate_key(x,y)] = data
 
-colors = {'jpeg': 'blue', 'webp': 'red', 'jxl':'green'}  
+colors = {'jp2': 'blue', 'webp': 'red', 'jxl':'green'}  
 
 # ================== PSNR =================
 group_coords = {}
