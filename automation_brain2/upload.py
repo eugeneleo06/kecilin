@@ -29,13 +29,17 @@ for x in ext:
         save_folder = "upload/" + folder + x[1:].lower() + "/" + key
         os.makedirs(save_folder, exist_ok=True)
         files = glob.glob(folder + key + '/*' + x.lower())
-        i = 0
-        for file in files:
+        n = len(files)
+        path = []
+        for i in range (n):
+            path.append(folder + key + "/mri_" + str(i+1) + x.lower())
+        i=0
+        for p in path:
             if x == CONST_JXL:
-                img_comp = imagecodecs.imread(file)
+                img_comp = imagecodecs.imread(p)
             else:
-                img_comp = cv2.imread(file)
-            print(file)
+                img_comp = cv2.imread(p)
+            print(p)
             im = Image.fromarray(img_comp)
             im.save(save_folder + "/mri_" + str(i+1) + ".bmp", 'BMP')
             i += 1
