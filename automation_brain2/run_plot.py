@@ -14,7 +14,7 @@ CONST_WEBP = '.WEBP'
 CONST_JXL = '.JXL'
 CONST_JP2 = '.JP2'
 
-quality = [100,90,80,70,60,50,40]
+quality = [100,90,80,70,60,50,40,30,20,10]
 ext = [CONST_WEBP, CONST_JXL, CONST_JP2]
 
 # Path to your single DICOM file
